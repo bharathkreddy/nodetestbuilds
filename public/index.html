@@ -1,0 +1,29 @@
+<!-- /public/index.html -->
+<!doctype html>
+<html>
+  <head>
+    <title>Save Text to File</title>
+  </head>
+  <body>
+    <h1>Save Your Text to a File</h1>
+
+    <form action="/save" method="POST">
+      <!-- Subject Input -->
+      <label for="subject">Subject:</label>
+      <input type="text" id="subject" name="subject" required><br><br>
+
+      <!-- Body Input -->
+      <label for="body">Body:</label><br>
+      <textarea id="body" name="body" rows="10" cols="50" required></textarea><br><br>
+
+      <!-- Submit Button -->
+      <button type="submit">Save to File</button>
+    </form>
+
+     <!-- Button to view the list of saved files -->
+     <br><br>
+     <button onclick="window.location.href='/files'">View Saved Files</button>
+     
+  </body>
+</html>
+
