@@ -1,7 +1,7 @@
 # Volumes : allways specify RO, RW with -v
 1. Anonymous Volumes
     - docker run -v /app/data
-    - Volumne attached to a single container, created a file in /var/etc/docker - but this dissapears as soon as contrainer is deleted.
+    - Volumne attached to a single container, created a file in /var/etc/docker - but this dissapears as soon as contrainer is deleted as this is the read write layer which container adds to the layers of image.
     - Survives container shudown (unless --rm is used) but not removal.
     - Cannot be shared across containers.
     - Cannot be reused even on same image.
@@ -15,10 +15,12 @@
     - Survives container shudown and restartrs.
     - Can be shared across containers.
     - Changes to this location is reflected real time in container. 
+    - use annonymous volumes with Bind Monuts to not let all folders in image being overwritten by local file system in bind mount ex. if we use bind mount for local/appcode:/app and want to preserve a file specify that file as anonymous volume. Docker allways gives preference to most detailed filepath(longest file path)
 
 ### This app uses Named Volumes to persist the data.
 
 # ARGuments & ENVironment Variables
+We should never bake secrets into any image as anyone would be able to see using docker history image_name.
 
 ### ENV : is available at run time.
 1. Change the docker file to define ENV (see line 13).  
@@ -42,3 +44,22 @@
     docker run -d -p 8000:8000 -v nodeenvappfiles:/app/files --rm --name brk8000 node:env8000</code></br>
     - Option 3: Pass env variable at run time to run any of above two images but with --env-file or -e flags.
     `docker run -d -p 12000:12000 -v nodeenvappfiles:/app/files --env-file ./.env --rm --name brk12000 node:env8000`
+
+
+# NETWORKING
+1. Docker to internet traffic is allways on.
+2. Docker to host (mongo running locally)
+    - can talk to local host by using `host.docker.internal` to graph local hosts ip address. This would not work on linux as this is a dns entry that is added while installing docker desktop on macos and windows. Linux natively uses docker engine and might not have this dns entry.
+    - on Linux use this instead
+    `docker run --network host -p 12000:3000 myapp_image`
+    - this causes docker to use same network as host and might cause port conflicts and causes docker to loose network isolation and is a security threat.
+3. Contrainer to contrainer communication.
+    - create network `docker network create my_network`
+    - run all docker images on this network `docker run --network my_network`
+    - reference container name wherever you want to connect to a container the name will resolve to its IP address if both containers are part of same network. 
+    - We need not expose any port on mongo in this case and communication happens freely as long as both containers are in same network.
+
+
+
+
+

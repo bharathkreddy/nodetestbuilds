@@ -1,8 +1,48 @@
-<!-- /public/index.html -->
 <!doctype html>
 <html>
   <head>
     <title>Save Text to File</title>
+    <script>
+      // Function to fetch movie details from the server
+      function fetchMovie() {
+        const subject = document.getElementById('subject').value;
+
+        // Make an AJAX request to the server to fetch the movie details
+        fetch(`/fetch-movie?title=${encodeURIComponent(subject)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              alert(data.error);
+            } else {
+              document.getElementById('body').value = data.description || 'No description available';
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching movie:', error);
+            alert('Failed to fetch movie');
+          });
+      }
+
+      // Function to fetch data from the SWAPI API via the server route
+      function fetchWeb() {
+        const subject = document.getElementById('subject').value;
+
+        // Make an AJAX request to the server route to fetch the SWAPI data
+        fetch(`/fetch-web?subject=${encodeURIComponent(subject)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              alert(data.error);
+            } else {
+              document.getElementById('body').value = JSON.stringify(data, null, 2);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching SWAPI data:', error);
+            alert('Failed to fetch data from SWAPI');
+          });
+      }
+    </script>
   </head>
   <body>
     <h1>Save Your Text to a File</h1>
@@ -10,7 +50,13 @@
     <form action="/save" method="POST">
       <!-- Subject Input -->
       <label for="subject">Subject:</label>
-      <input type="text" id="subject" name="subject" required><br><br>
+      <input type="text" id="subject" name="subject" required>
+      
+      <!-- Fetch button next to the subject input -->
+      <button type="button" onclick="fetchMovie()">Fetch Movie</button>
+
+      <!-- Fetch Web button next to fetch button -->
+      <button type="button" onclick="fetchWeb()">Fetch Web</button><br><br>
 
       <!-- Body Input -->
       <label for="body">Body:</label><br>
@@ -20,10 +66,9 @@
       <button type="submit">Save to File</button>
     </form>
 
-     <!-- Button to view the list of saved files -->
-     <br><br>
-     <button onclick="window.location.href='/files'">View Saved Files</button>
-     
+    <!-- Button to view the list of saved files -->
+    <br><br>
+    <button onclick="window.location.href='/files'">View Saved Files</button>
+
   </body>
 </html>
-

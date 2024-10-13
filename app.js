@@ -1,14 +1,18 @@
-// /app.js
-
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const bodyParser = require('body-parser');
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import bodyParser from 'body-parser';
+import { MongoClient } from 'mongodb';
+import fetch from 'node-fetch';  // Use ES Module import
 
 const app = express();
+// const mongoUri = 'mongodb://127.0.0.1:27017';
+//above will not work, but below is how to grab host ip address from inside a container.
+const mongoUri = 'mongodb://mymongo:27017'
+const client = new MongoClient(mongoUri);
 
 // Create a folder to store the files if it doesn't exist
-const filesDir = path.join(__dirname, 'files');
+const filesDir = path.resolve('files');
 if (!fs.existsSync(filesDir)) {
     fs.mkdirSync(filesDir);
 }
@@ -31,7 +35,6 @@ app.post('/save', (req, res) => {
     });
 });
 
-
 // Route to list all saved files
 app.get('/files', (req, res) => {
     fs.readdir(filesDir, (err, files) => {
@@ -48,7 +51,58 @@ app.get('/files', (req, res) => {
     });
 });
 
-// Start the server, PORT is selected as env variable to be provided during docker image build process.
-app.listen(process.env.PORT, () => {
-    console.log(`app listening on port ${process.env.PORT}`);
+// Route to fetch a movie from the MongoDB database
+app.get('/fetch-movie', async (req, res) => {
+    const title = req.query.title;
+
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    try {
+        await client.connect();
+        const db = client.db('mflix');
+        const collection = db.collection('movies');
+        const movie = await collection.findOne({ title: title });
+
+        if (movie) {
+            res.json({ description: movie.plot || 'No description available' });
+        } else {
+            res.json({ error: 'Movie not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch movie from MongoDB' });
+    } finally {
+        await client.close();
+    }
+});
+
+// New route to fetch Star Wars character data from SWAPI
+app.get('/fetch-web', async (req, res) => {
+    const subject = req.query.subject;
+
+    if (!subject || isNaN(subject)) {
+        return res.status(400).json({ error: 'Please provide a valid number as the subject.' });
+    }
+
+    const swapiUrl = `https://swapi.dev/api/people/${subject}`;
+
+    try {
+        const response = await fetch(swapiUrl);
+        if (!response.ok) {
+            return res.status(500).json({ error: 'Failed to fetch data from SWAPI.' });
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching data from SWAPI:', error);
+        res.status(500).json({ error: 'Error fetching data from SWAPI.' });
+    }
+});
+
+// Start the server
+app.listen(process.env.PORT || 3000, () => {
+    console.log(`app listening on port ${process.env.PORT || 3000}`);
 });
