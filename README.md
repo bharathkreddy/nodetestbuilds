@@ -35,10 +35,10 @@
 1. On docker file, we have specified an ARG with default value of 80, but we can build docker image overriding this default. 
 
     - Option 1: Build image with default args and do not override port
-    &nbsp;<code>docker build -t node:env80 .
-    docker run -d -p 3000:80 -v nodeenvappfiles:/app/files --rm --name brk80 node:env80</code>
+    <br>&nbsp;<code>docker build -t node:env80 .
+    docker run -d -p 3000:80 -v nodeenvappfiles:/app/files --rm --name brk80 node:env80</code></br>
     - Option 2: Pass argument while building image to override default arg with 8000
-    &nbsp;<code>docker build -t node:env8000 --build-arg DEFAULT_PORT=8000 .  
-    docker run -d -p 8000:8000 -v nodeenvappfiles:/app/files --rm --name brk8000 node:env8000</code>
+    <br>&nbsp;  <code>docker build -t node:env8000 --build-arg DEFAULT_PORT=8000 .  
+    docker run -d -p 8000:8000 -v nodeenvappfiles:/app/files --rm --name brk8000 node:env8000</code></br>
     - Option 3: Pass env variable at run time to run any of above two images but with --env-file or -e flags.
     `docker run -d -p 12000:12000 -v nodeenvappfiles:/app/files --env-file ./.env --rm --name brk12000 node:env8000`
