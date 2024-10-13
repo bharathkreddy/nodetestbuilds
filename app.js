@@ -48,7 +48,7 @@ app.get('/files', (req, res) => {
     });
 });
 
-// Start the server
-app.listen(3000, () => {
-    console.log("app listening on port 3000");
+// Start the server, PORT is selected as env variable to be provided during docker image build process.
+app.listen(process.env.PORT, () => {
+    console.log(`app listening on port ${process.env.PORT}`);
 });
