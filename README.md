@@ -60,6 +60,9 @@ We should never bake secrets into any image as anyone would be able to see using
     - We need not expose any port on mongo in this case and communication happens freely as long as both containers are in same network.
 
 
+NOTE: To mount local mongodb's db files to a docker image use below
+`docker run -d -v /var/lib/mongodb:/data/db --name mymongo --rm --network my_network mongo:noble`
+
 
 
 
