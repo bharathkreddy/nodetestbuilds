@@ -1,0 +1,29 @@
+version: '3.3' 
+
+services:
+  mymongo:
+    image: 'mongo:noble'
+    volumes:
+      - /var/lib/mongodb:/data/db
+    container_name: mymongo_container
+
+  mynode:
+    image: 'node:mongo'
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 12000:12000
+    volumes:
+      - nodeenvappfiles:/app/files
+    env_file:
+      - ./.env
+    depends_on:
+      - mymongo
+    container_name: mynode_container
+
+
+
+volumes:
+  nodeenvappfiles:
+

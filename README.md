@@ -64,5 +64,9 @@ NOTE: To mount local mongodb's db files to a docker image use below
 `docker run -d -v /var/lib/mongodb:/data/db --name mymongo --rm --network my_network mongo:noble`
 
 
+# DOCKER COMPOSE
+1. Creates a seperate network for all containers specfied, so no need to specify netowork.
+2. Use `docker-compose down -v` to remove volumes created, along with the containers. 
+3. `docker-composet up -d` to start in detached mode.
 
 
